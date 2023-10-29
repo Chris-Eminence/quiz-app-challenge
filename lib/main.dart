@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-//TODO: Step 2 - Import the rFlutter_Alert package here.
+import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:quiz_test/quiz_brain.dart';
 
 void main() => runApp(Quizzler());
@@ -8,6 +8,7 @@ class Quizzler extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       home: Scaffold(
         backgroundColor: Colors.grey.shade900,
         body: SafeArea(
@@ -22,6 +23,7 @@ class Quizzler extends StatelessWidget {
 }
 
 class QuizPage extends StatefulWidget {
+  
   @override
   _QuizPageState createState() => _QuizPageState();
 }
@@ -30,26 +32,54 @@ class _QuizPageState extends State<QuizPage> {
   List<Widget> scoreKeeper = [];
   QuizBrain quizBrain = QuizBrain();
 
-  void checkAnswer(bool userPickedAnswer){
-    bool correctAnswer = quizBrain.getQuestionAnswer();
-    setState(() {
+void checkAnswer(bool userPickedAnswer){
+  bool correctAnswer = quizBrain.getQuestionAnswer();
 
-      //TODO: Step 4 - Use IF/ELSE to check if we've reached the end of the quiz. If true, execute Part A, B, C, D.
-      //TODO: Step 4 Part A - show an alert using rFlutter_alert (remember to read the docs for the package!)
-      //HINT! Step 4 Part B is in the quiz_brain.dart
-      //TODO: Step 4 Part C - reset the questionNumber,
-      //TODO: Step 4 Part D - empty out the scoreKeeper.
-
-      //TODO: Step 5 - If we've not reached the end, ELSE do the answer checking steps below 👇
-
-    if (userPickedAnswer == correctAnswer) {
-     scoreKeeper.add(Icon(Icons.check, color: Colors.green));
-    } else {
-      scoreKeeper.add(Icon(Icons.close, color: Colors.red));
-    }
+  setState(() {
+//TODO: Step 4 - Use IF/ELSE to check if we've reached the end of the quiz. If true, execute Part A, B, C, D.
+//TODO: Step 4 Part A - show an alert using rFlutter_alert (remember to read the docs for the package!)
+//HINT! Step 4 Part B is in the quiz_brain.dart
+//TODO: Step 4 Part C - reset the questionNumber,
+//TODO: Step 4 Part D - empty out the scoreKeeper.
+    if (!quizBrain.isFinished()) {
+      if (userPickedAnswer == correctAnswer) {
+      scoreKeeper.add(Icon(Icons.check, color: Colors.green));
+      } else {
+        scoreKeeper.add(Icon(Icons.close, color: Colors.red));
+      }
       quizBrain.nextQuestion();
-    });
-  }
+    }
+
+//TODO: Step 5 - If we've not reached the end, ELSE do the answer checking steps below 👇
+    else {
+      print('last question');
+      Alert(
+        context: context,
+        
+        title: "Finished!",
+        desc: "You've reached the end of the quiz.",
+        buttons: [
+          DialogButton(
+            child: Text(
+              "CANCEL",
+              style: TextStyle(color: Colors.white, fontSize: 20),
+            ),
+            onPressed: () {
+              setState(() {
+              quizBrain.reset();
+              scoreKeeper = [];
+              Navigator.pop(context);
+              });
+              
+            },
+            color: Colors.blueAccent,
+            radius: BorderRadius.circular(0.0),
+          ),
+        ],
+      ).show();
+    }
+  });
+}
 
   @override
   Widget build(BuildContext context) {
@@ -57,6 +87,16 @@ class _QuizPageState extends State<QuizPage> {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
+
+        Padding(
+          padding: const EdgeInsets.only(top: 30),
+          child: Text("Question ${quizBrain.getQuestionNumber()}",
+            textAlign: TextAlign.center,  
+            style: const TextStyle(color: Colors.white,
+              fontSize: 25
+            ),
+          ),
+        ),
         Expanded(
           flex: 5,
           child: Padding(
@@ -112,8 +152,14 @@ class _QuizPageState extends State<QuizPage> {
           ),
         ),
         //TODO: Add a Row here as your score keeper
-        Row(
-          children: scoreKeeper,
+        Padding(
+          padding: const EdgeInsets.only(bottom: 15, left: 15, right: 15),
+          child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: scoreKeeper,
+            ),
+          ),
         )
       ],
     );
